@@ -1,40 +1,41 @@
 var mongoose = require('mongoose/');
 
-mongoose.connect('mongodb://localhost/MyDatabase',{useMongoClient: true});
+mongoose.connect('mongodb://localhost/MyDataBase',{useMongoClient: true});
 
 var Schema = mongoose.Schema;
 var UserDetail = new Schema({
-      username: String,
-      password: String
-    }, {
-      collection: 'userInfo'
-    });
+    username: String,
+    password: String,
+    displayName: String,
+}, {
+    collection: 'userInfo'
+});
 var UserDetails = mongoose.model('userInfo', UserDetail);
 
-exports.findById = function(id, cb) {
-  process.nextTick(function() {
+var records = [
+    {"id":1,"username":"jai","password":"password","displayName":"Jaipal"},
+];
 
-    UserDetails.findById(id,function(err,user)
-    {
-      if(user) {
-        cb(null, user);
-      } else {
-        cb(new Error('User ' + id + ' does not exist'));
-      }
-    })
-  });
+exports.findById = function(id, cb) {
+    process.nextTick(function() {
+        var idx = id-1;
+        if(records[idx]) {
+            cb(null, records[idx]);
+        }  else {
+            cb(new Error('User ' + id + ' does not exist'));
+        }
+
+    });
 }
 
 exports.findByUsername = function(username, cb) {
-  process.nextTick(function() {
-    UserDetails.findOne({
-      'username': username, 
-    }, function(err, user) {
-      if (err) {
-        return cb(err);
-      } else {
-        return cb(null,user);
-      }
+    process.nextTick(function() {
+        console.log(username);
+        for(var i=0 ;i<records.length;i++) {
+            if(records[i].username == username) {
+                return cb(null,records[i]);
+            }
+        }
+        return cb("error");
     });
-  });
 }
